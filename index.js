@@ -31,6 +31,12 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const items = await itemsCollection.findOne(query);
             res.send(items);
+        });
+        //Post
+        app.post('/items', async (req, res) => {
+            const newItem = req.body;
+            const result = await itemsCollection.insertOne(newItem);
+            res.send(result);
         })
 
     }
