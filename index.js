@@ -23,9 +23,10 @@ function verifyJWT(req, res, next) {
             return res.status(403).send({ message: 'Forbidden access' });
         }
         console.log('decoded', decoded);
+        next();
     })
 
-    next();
+
 }
 
 
