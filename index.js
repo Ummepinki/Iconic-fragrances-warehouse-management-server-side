@@ -88,10 +88,18 @@ async function run() {
 
         //update 
 
-        app.delete('/items/item', async (req, res) => {
-            const updatedItem = req.body;
-            const query = { _id: ObjectId(updatedItem._id) };
-            const result = await itemsCollection.deleteOne(query, updatedItem);
+        app.put('/items/:item', async (req, res) => {
+
+            const id = req.params.id;
+            const updateItem = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    updateItem
+                },
+            };
+            const result = await itemsCollection.updateOne(filter, updateDoc, options);
             // const newItem = req.body;
             // const result = await itemsCollection.insertOne(newItem);
             res.send(result);
