@@ -23,6 +23,7 @@ function verifyJWT(req, res, next) {
             return res.status(403).send({ message: 'Forbidden access' });
         }
         console.log('decoded', decoded);
+        req.decoded = decoded;
         next();
     })
 
@@ -37,7 +38,7 @@ async function run() {
     try {
         await client.connect();
         const itemsCollection = client.db('perfumeItems').collection('items');
-        const addCollection = client.db('perfumeItem').collection('add');
+        const addCollection = client.db('perfumeItems').collection('add');
 
         //auth
         app.post('/login', async (req, res) => {
@@ -56,11 +57,18 @@ async function run() {
         });
 
         // add item api
-        app.get('/items/add', verifyJWT, async (req, res) => {
-            const query = {};
-            const cursor = addCollection.find(query);
-            const items = await cursor.toArray();
-            res.send(items);
+        app.get('/items', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            const email = req.query.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const cursor = addCollection.find(query);
+                const items = await cursor.toArray();
+                res.send(items);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden access' })
+            }
         });
 
         app.get('/items/:id', async (req, res) => {
@@ -88,7 +96,7 @@ async function run() {
 
         //update 
 
-        app.put('/items/:item', async (req, res) => {
+        app.put('/items/:id', async (req, res) => {
 
             const id = req.params.id;
             const updateItem = req.body;
@@ -115,6 +123,7 @@ run().catch(console.dir);
 
 app.get('/', (req, res) => {
     res.send('Running project');
+
 });
 
 app.listen(port, () => {
