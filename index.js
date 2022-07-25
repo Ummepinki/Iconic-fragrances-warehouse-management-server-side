@@ -48,7 +48,7 @@ async function run() {
             });
             res.send({ accessToken });
         })
-
+        //get api items
         app.get('/items', async (req, res) => {
             const query = {};
             const cursor = itemsCollection.find(query);
@@ -70,7 +70,7 @@ async function run() {
                 res.status(403).send({ message: 'forbidden access' })
             }
         });
-
+        // get items on
         app.get('/items/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -99,12 +99,12 @@ async function run() {
         app.put('/items/:id', async (req, res) => {
 
             const id = req.params.id;
-            const updateItem = req.body;
+            const setQuantity = req.body;
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
-                    updateItem
+                    setQuantity
                 },
             };
             const result = await itemsCollection.updateOne(filter, updateDoc, options);
